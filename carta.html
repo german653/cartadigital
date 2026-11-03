@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2b2118">
+<title>Carta digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2b2118;--paper:#faf6ef;--card:#fffdf8;--accent:#c4532d;--muted:#7a6a5c;--line:#e3d9c9;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45;padding-bottom:env(safe-area-inset-bottom,0px)}
+header{background:var(--ink);color:#fff;text-align:center;padding:calc(34px + env(safe-area-inset-top,0px)) 22px 30px}
+.mark{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;border:2px solid var(--accent);display:grid;place-items:center;font-family:"DM Serif Display",Georgia,serif;font-size:30px;color:var(--accent)}
+h1{margin:0;font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:clamp(34px,10vw,46px);line-height:1.05;letter-spacing:-.5px}
+.tagline{margin:8px 0 0;color:rgba(255,255,255,.72);font-size:15px}
+.nav{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:30px;padding:9px 16px;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.chip[aria-current="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip:focus-visible,.search:focus-visible,.wa:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.searchwrap{padding:0 16px 12px}
+.search{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 14px;font:inherit;font-size:15px;color:var(--ink)}
+main{max-width:640px;margin:0 auto;padding:8px 20px 40px}
+section{scroll-margin-top:128px;padding-top:22px}
+h2{margin:0 0 4px;font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:30px;color:var(--accent)}
+.note{margin:0 0 10px;color:var(--muted);font-size:14px}
+.item{padding:14px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.row{display:flex;align-items:baseline;gap:8px}
+.name{font-weight:700;font-size:17px}
+.dots{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px);min-width:16px}
+.price{font-weight:700;font-size:17px;white-space:nowrap}
+.desc{margin:3px 0 0;color:var(--muted);font-size:14.5px;max-width:88%}
+.tag{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:20px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;vertical-align:2px;letter-spacing:.3px}
+.empty{padding:40px 0;text-align:center;color:var(--muted)}
+footer{background:var(--ink);color:rgba(255,255,255,.78);text-align:center;padding:28px 22px calc(34px + env(safe-area-inset-bottom,0px));font-size:14.5px}
+footer b{color:#fff}
+.wa{display:inline-block;margin-top:14px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;border-radius:12px;padding:13px 22px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="mark" id="mark">C</div>
+  <h1 id="biz">Nombre del local</h1>
+  <p class="tagline" id="tag"></p>
+</header>
+<div class="nav">
+  <div class="chips" id="chips" role="tablist" aria-label="Categorías"></div>
+  <div class="searchwrap"><input class="search" id="q" type="search" placeholder="Buscar en la carta…" aria-label="Buscar en la carta"></div>
+</div>
+<main id="menu"></main>
+<footer>
+  <div id="info"></div>
+  <a class="wa" id="wa" href="#" hidden>Pedir por WhatsApp</a>
+</footer>
+
+<script>
+/* ============ EDITÁ SOLO ESTA PARTE ============ */
+var CONFIG={
+  nombre:"Casa Demo",
+  eslogan:"Cocina de barrio · Abierto todos los días",
+  info:"<b>Horarios:</b> Lun a Dom de 12 a 15 y de 20 a 00<br>Los precios pueden cambiar sin aviso.",
+  whatsapp:"",            // ejemplo: "5493541123456" (con código de país, sin + ni espacios). Vacío = no se muestra.
+  mensajeWhatsapp:"Hola! Quiero hacer un pedido."
+};
+var CARTA=[
+  {titulo:"Entradas",items:[
+    {n:"Provoleta",d:"Provolone fundido a la parrilla con orégano y tomate.",p:9500},
+    {n:"Empanadas (x3)",d:"Carne cortada a cuchillo, jamón y queso o humita.",p:8700,t:"Casero"},
+    {n:"Rabas",d:"Anillos de calamar dorados con alioli de la casa.",p:14800}
+  ]},
+  {titulo:"Principales",items:[
+    {n:"Milanesa napolitana",d:"Con papas fritas. Jamón, salsa y muzzarella.",p:16900},
+    {n:"Bife de chorizo",d:"350 g a la parrilla con guarnición a elección.",p:22500},
+    {n:"Ravioles de ricota",d:"Con salsa fileto, bolognesa o crema.",p:15200},
+    {n:"Wok de vegetales",d:"Salteado de estación con salsa de soja y sésamo.",p:13900,t:"Veggie"}
+  ]},
+  {titulo:"Pizzas",nota:"Todas de 8 porciones.",items:[
+    {n:"Muzzarella",d:"Salsa de tomate, muzzarella y aceitunas.",p:12800},
+    {n:"Fugazzeta",d:"Cebolla, muzzarella y orégano.",p:14200},
+    {n:"Especial",d:"Jamón, morrones y huevo.",p:15600,t:"Nuevo"}
+  ]},
+  {titulo:"Postres",items:[
+    {n:"Flan casero",d:"Con dulce de leche y crema.",p:6800},
+    {n:"Panqueque con dulce de leche",d:"Con bocha de helado de crema.",p:7900},
+    {n:"Tiramisú",d:"Receta clásica, porción individual.",p:8200}
+  ]},
+  {titulo:"Bebidas",items:[
+    {n:"Gaseosa 500 ml",d:"",p:3200},
+    {n:"Agua mineral",d:"Con o sin gas.",p:2800},
+    {n:"Cerveza artesanal",d:"Rubia, roja o IPA. Pinta 500 ml.",p:5500},
+    {n:"Copa de vino",d:"Malbec, Cabernet o Blanco.",p:5200}
+  ]}
+];
+/* ============ FIN ============ */
+
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var fmt=new Intl.NumberFormat("es-AR");
+  $("biz").textContent=CONFIG.nombre;document.title=CONFIG.nombre+" – Carta";
+  $("mark").textContent=(CONFIG.nombre||"C").charAt(0).toUpperCase();
+  $("tag").textContent=CONFIG.eslogan;$("info").innerHTML=CONFIG.info;
+  if(CONFIG.whatsapp){var a=$("wa");a.hidden=false;a.href="https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent(CONFIG.mensajeWhatsapp)}
+
+  var menu=$("menu"),chips=$("chips"),secs=[],btns=[];
+  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+  CARTA.forEach(function(cat,i){
+    var s=el("section");s.id="cat"+i;s.appendChild(el("h2","",cat.titulo));
+    if(cat.nota){s.appendChild(el("p","note",cat.nota))}
+    cat.items.forEach(function(it){
+      var d=el("div","item"),r=el("div","row"),nm=el("span","name",it.n);
+      if(it.t){nm.appendChild(el("span","tag",it.t.toUpperCase()))}
+      r.appendChild(nm);r.appendChild(el("span","dots"));r.appendChild(el("span","price","$"+fmt.format(it.p)));
+      d.appendChild(r);if(it.d){d.appendChild(el("p","desc",it.d))}
+      d._txt=(it.n+" "+(it.d||"")).toLowerCase();s.appendChild(d);
+    });
+    menu.appendChild(s);secs.push(s);
+    var b=el("button","chip",cat.titulo);b.type="button";
+    b.addEventListener("click",function(){s.scrollIntoView({behavior:"smooth",block:"start"})});
+    chips.appendChild(b);btns.push(b);
+  });
+  var empty=el("p","empty","No encontramos nada con esa búsqueda.");empty.hidden=true;menu.appendChild(empty);
+
+  function mark(i){btns.forEach(function(b,k){if(k===i){b.setAttribute("aria-current","true");
+    var c=chips,x=b.offsetLeft-(c.clientWidth-b.offsetWidth)/2;c.scrollTo({left:x,behavior:"smooth"})}else{b.removeAttribute("aria-current")}})}
+  mark(0);
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){mark(secs.indexOf(e.target))}})},{rootMargin:"-140px 0px -65% 0px"});
+    secs.forEach(function(s){io.observe(s)});
+  }
+  $("q").addEventListener("input",function(){
+    var v=this.value.trim().toLowerCase(),any=false;
+    secs.forEach(function(s,i){
+      var vis=0;[].forEach.call(s.querySelectorAll(".item"),function(d){var ok=!v||d._txt.indexOf(v)>-1;d.hidden=!ok;if(ok)vis++});
+      s.hidden=vis===0;btns[i].hidden=vis===0;if(vis)any=true;
+    });
+    empty.hidden=any;
+  });
+})();
+</script>
+</body>
+</html>
